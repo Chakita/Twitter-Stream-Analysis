@@ -3,6 +3,16 @@ import tweepy
 from tweepy import Stream
 import socket
 import json
+import threading
+import sys
+
+def timer_elapsed(sock,csock):
+    print("Timer elapsed")
+    sock.shutdown(socket.SHUT_RDWR)
+    sock.close()
+    csock.shutdown(socket.SHUT_RDWR)
+    csock.close()
+    #sys.exit()
 
 with open('tokens.txt','r') as f:
     consumer_key=f.readline().strip()
@@ -25,13 +35,15 @@ class Listener(Stream):
                 if h in txt:
                     hashtag_in_message=h
                     if hashtag_in_message!="":
+                        hashtag_in_message=hashtag_in_message+'\n'
                         encode_message = hashtag_in_message.encode('utf-8')
                         print(encode_message)
                         self.client_socket.send(encode_message)
                         return True
                     else:
                         print("EMPTY")
-        except:
+        except Exception as e:
+            print(e)
             print("Error in trigger")
         return True
     def if_error(self,status):
@@ -52,5 +64,7 @@ if __name__ == "__main__":
     new_socket.listen(5)
     c,address = new_socket.accept()
     print("Request from:",address)
+    timer = threading.Timer(360, timer_elapsed,[new_socket,c])
+    timer.start()
     stream_tweets(c)
     
