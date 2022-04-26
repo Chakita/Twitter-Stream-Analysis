@@ -35,6 +35,7 @@ class Listener(Stream):
                 if h in txt:
                     hashtag_in_message=h
                     if hashtag_in_message!="":
+                        hashtag_in_message=hashtag_in_message.replace("#","")
                         hashtag_in_message=hashtag_in_message+'\n'
                         encode_message = hashtag_in_message.encode('utf-8')
                         print(encode_message)
